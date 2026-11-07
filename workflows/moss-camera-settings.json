@@ -1,0 +1,1115 @@
+{
+ "last_node_id": 22,
+ "last_link_id": 27,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "MarkdownNote",
+   "pos": [
+    -340,
+    90
+   ],
+   "size": [
+    310,
+    560
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "widgets_values": [
+    "**How to use it**\n\n1. Write your **PROMPT** and press **Run**. It stops after the first render.\n2. Your image appears in **Camera Settings**. **Click your subject.** The box shows what the lens will keep.\n3. Pick your menus and press **Run** again. Only the finish runs, so it's quick.\n\n**New picture:** change **Seed** or the prompt, then click the subject again. Keep Seed on **fixed**. On randomize, every Run makes a new image, so it stops every time.\n\n**Part of the subject went soft?** Set `keep_sharp` to Wide.\n\n**Want a real lens look?** Set `foreground` to Blurred, so things nearer than your click go soft too. Click something close to the camera to pull the focus onto it.\n\n**Subject looks cut out?** Set `subject_edge` to Soft. Very soft can blur a face in profile.\n\n**Face detail** is off by default. Only try it when the face is large in the frame: it damages small faces, mouths and eyes first, and the added detail is invented.\n\n**Lens** is a crop, so perspective doesn't change.\n\nThe nodes at the bottom run on their own. The detail prompt is in there if you want to change it."
+   ],
+   "title": "Read me"
+  },
+  {
+   "id": 2,
+   "type": "CLIPTextEncode",
+   "pos": [
+    0,
+    90
+   ],
+   "size": [
+    460,
+    300
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "an elderly tailor standing at a long cutting table in a narrow upstairs workshop, chalk in his hand, leaning over a length of dark wool and marking a line, placed on the left third of the frame, hard morning sun through a tall window on the right throwing the shadow of the window bars across the table, the cloth and his forearms, rolls of fabric and hanging half-made jackets soft in the shadow behind him, a pair of big steel shears and a tape measure out of focus in the near foreground, candid documentary photograph, ordinary real face with natural skin"
+   ],
+   "title": "PROMPT"
+  },
+  {
+   "id": 3,
+   "type": "PrimitiveInt",
+   "pos": [
+    0,
+    430
+   ],
+   "size": [
+    220,
+    90
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "INT",
+     "type": "INT",
+     "links": [
+      7,
+      19
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PrimitiveInt"
+   },
+   "widgets_values": [
+    2121,
+    "fixed"
+   ],
+   "title": "Seed"
+  },
+  {
+   "id": 4,
+   "type": "EmptyFlux2LatentImage",
+   "pos": [
+    240,
+    430
+   ],
+   "size": [
+    220,
+    130
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "EmptyFlux2LatentImage"
+   },
+   "widgets_values": [
+    1216,
+    832,
+    1
+   ],
+   "title": "Size"
+  },
+  {
+   "id": 5,
+   "type": "CameraSettings",
+   "pos": [
+    500,
+    90
+   ],
+   "size": [
+    480,
+    760
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 10
+    },
+    {
+     "name": "focus_image",
+     "type": "STRING",
+     "link": null,
+     "widget": {
+      "name": "focus_image"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "crop",
+     "type": "IMAGE",
+     "links": [
+      13,
+      24
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "settings",
+     "type": "CAMERA_SETTINGS",
+     "links": [
+      25
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "denoise",
+     "type": "FLOAT",
+     "links": [
+      20
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CameraSettings"
+   },
+   "widgets_values": [
+    "50mm",
+    "Blurred",
+    "Normal",
+    "Normal",
+    "Light",
+    "Off",
+    "Normal",
+    -1,
+    -1,
+    "",
+    "Natural",
+    "Sharp"
+   ]
+  },
+  {
+   "id": 6,
+   "type": "SaveImage",
+   "pos": [
+    1020,
+    90
+   ],
+   "size": [
+    760,
+    620
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 27
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "camera-settings/moss"
+   ],
+   "title": "Result"
+  },
+  {
+   "id": 10,
+   "type": "UNETLoader",
+   "pos": [
+    0,
+    930
+   ],
+   "size": [
+    300,
+    82
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3,
+      15
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "moss_image_sft_int8_convrot.safetensors",
+    "default"
+   ],
+   "title": "MOSS model"
+  },
+  {
+   "id": 11,
+   "type": "CLIPLoader",
+   "pos": [
+    260,
+    930
+   ],
+   "size": [
+    300,
+    106
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      1,
+      2,
+      11,
+      12
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "qwen3.5_9b_w4a8_gptq.safetensors",
+    "moss_image",
+    "default"
+   ],
+   "title": "Text model"
+  },
+  {
+   "id": 12,
+   "type": "VAELoader",
+   "pos": [
+    520,
+    930
+   ],
+   "size": [
+    300,
+    58
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      9,
+      14,
+      22
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "flux2-vae.safetensors"
+   ],
+   "title": "VAE"
+  },
+  {
+   "id": 13,
+   "type": "CLIPTextEncode",
+   "pos": [
+    780,
+    930
+   ],
+   "size": [
+    420,
+    110
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "nsfw, worst quality, bad anatomy, watermark, jpeg artifact"
+   ],
+   "title": "Negative prompt"
+  },
+  {
+   "id": 14,
+   "type": "KSampler",
+   "pos": [
+    1040,
+    930
+   ],
+   "size": [
+    300,
+    280
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 4
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 5
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 6
+    },
+    {
+     "name": "seed",
+     "type": "INT",
+     "link": 7,
+     "widget": {
+      "name": "seed"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    2121,
+    "fixed",
+    25,
+    2.5,
+    "er_sde",
+    "simple",
+    1.0
+   ],
+   "title": "First render"
+  },
+  {
+   "id": 15,
+   "type": "VAEDecode",
+   "pos": [
+    1300,
+    930
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 8
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      10
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": [],
+   "title": "Decode"
+  },
+  {
+   "id": 16,
+   "type": "CLIPTextEncode",
+   "pos": [
+    0,
+    990
+   ],
+   "size": [
+    420,
+    130
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      16
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "candid photograph, sharp focus, crisp fine detail, natural texture, natural skin with real pores, fine strands of hair"
+   ],
+   "title": "Detail prompt"
+  },
+  {
+   "id": 17,
+   "type": "CLIPTextEncode",
+   "pos": [
+    260,
+    990
+   ],
+   "size": [
+    420,
+    110
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 12
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      17
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "nsfw, worst quality, bad anatomy, watermark, jpeg artifact, blurry, soft focus, out of focus"
+   ],
+   "title": "Detail negative"
+  },
+  {
+   "id": 18,
+   "type": "VAEEncode",
+   "pos": [
+    520,
+    990
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 13
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 14
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      18
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   },
+   "widgets_values": [],
+   "title": "Encode crop"
+  },
+  {
+   "id": 19,
+   "type": "KSampler",
+   "pos": [
+    780,
+    990
+   ],
+   "size": [
+    300,
+    280
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 15
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 16
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 17
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 18
+    },
+    {
+     "name": "seed",
+     "type": "INT",
+     "link": 19,
+     "widget": {
+      "name": "seed"
+     }
+    },
+    {
+     "name": "denoise",
+     "type": "FLOAT",
+     "link": 20,
+     "widget": {
+      "name": "denoise"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      21
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    2121,
+    "fixed",
+    25,
+    2.5,
+    "er_sde",
+    "simple",
+    0.35
+   ],
+   "title": "Detail pass"
+  },
+  {
+   "id": 20,
+   "type": "VAEDecode",
+   "pos": [
+    1040,
+    990
+   ],
+   "size": [
+    300,
+    50
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 21
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 22
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      23
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "widgets_values": [],
+   "title": "Decode detail"
+  },
+  {
+   "id": 21,
+   "type": "ImageSharpen",
+   "pos": [
+    1300,
+    990
+   ],
+   "size": [
+    300,
+    110
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      26
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageSharpen"
+   },
+   "widgets_values": [
+    1,
+    0.8,
+    0.2
+   ],
+   "title": "Light sharpen"
+  },
+  {
+   "id": 22,
+   "type": "CameraFinish",
+   "pos": [
+    1560,
+    990
+   ],
+   "size": [
+    300,
+    90
+   ],
+   "flags": {
+    "collapsed": true
+   },
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "crop",
+     "type": "IMAGE",
+     "link": 24
+    },
+    {
+     "name": "settings",
+     "type": "CAMERA_SETTINGS",
+     "link": 25
+    },
+    {
+     "name": "detail",
+     "type": "IMAGE",
+     "link": 26
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      27
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "depth_map",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CameraFinish"
+   },
+   "widgets_values": [],
+   "title": "Camera Finish"
+  }
+ ],
+ "links": [
+  [
+   1,
+   11,
+   0,
+   2,
+   0,
+   "CLIP"
+  ],
+  [
+   2,
+   11,
+   0,
+   13,
+   0,
+   "CLIP"
+  ],
+  [
+   3,
+   10,
+   0,
+   14,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   2,
+   0,
+   14,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   5,
+   13,
+   0,
+   14,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   6,
+   4,
+   0,
+   14,
+   3,
+   "LATENT"
+  ],
+  [
+   7,
+   3,
+   0,
+   14,
+   4,
+   "INT"
+  ],
+  [
+   8,
+   14,
+   0,
+   15,
+   0,
+   "LATENT"
+  ],
+  [
+   9,
+   12,
+   0,
+   15,
+   1,
+   "VAE"
+  ],
+  [
+   10,
+   15,
+   0,
+   5,
+   0,
+   "IMAGE"
+  ],
+  [
+   11,
+   11,
+   0,
+   16,
+   0,
+   "CLIP"
+  ],
+  [
+   12,
+   11,
+   0,
+   17,
+   0,
+   "CLIP"
+  ],
+  [
+   13,
+   5,
+   0,
+   18,
+   0,
+   "IMAGE"
+  ],
+  [
+   14,
+   12,
+   0,
+   18,
+   1,
+   "VAE"
+  ],
+  [
+   15,
+   10,
+   0,
+   19,
+   0,
+   "MODEL"
+  ],
+  [
+   16,
+   16,
+   0,
+   19,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   17,
+   17,
+   0,
+   19,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   18,
+   18,
+   0,
+   19,
+   3,
+   "LATENT"
+  ],
+  [
+   19,
+   3,
+   0,
+   19,
+   4,
+   "INT"
+  ],
+  [
+   20,
+   5,
+   2,
+   19,
+   5,
+   "FLOAT"
+  ],
+  [
+   21,
+   19,
+   0,
+   20,
+   0,
+   "LATENT"
+  ],
+  [
+   22,
+   12,
+   0,
+   20,
+   1,
+   "VAE"
+  ],
+  [
+   23,
+   20,
+   0,
+   21,
+   0,
+   "IMAGE"
+  ],
+  [
+   24,
+   5,
+   0,
+   22,
+   0,
+   "IMAGE"
+  ],
+  [
+   25,
+   5,
+   1,
+   22,
+   1,
+   "CAMERA_SETTINGS"
+  ],
+  [
+   26,
+   21,
+   0,
+   22,
+   2,
+   "IMAGE"
+  ],
+  [
+   27,
+   22,
+   0,
+   6,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "Your controls",
+   "bounding": [
+    -360,
+    20,
+    2160,
+    860
+   ],
+   "color": "#3f789e",
+   "font_size": 28,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "Runs by itself",
+   "bounding": [
+    -20,
+    890,
+    1860,
+    150
+   ],
+   "color": "#444444",
+   "font_size": 20,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.6,
+   "offset": [
+    420,
+    40
+   ]
+  }
+ },
+ "version": 0.4
+}
