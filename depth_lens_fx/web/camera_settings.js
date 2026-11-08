@@ -101,6 +101,8 @@ app.registerExtension({
             if (lens && !lens.options?.values?.includes(lens.value)) lens.value = "85mm";
             const front = this.widgets?.find((w) => w.name === "foreground");
             if (front && !front.options?.values?.includes(front.value)) front.value = "Sharp";
+            const nudge = this.widgets?.find((w) => w.name === "focus_nudge");
+            if (nudge && !nudge.options?.values?.includes(nudge.value)) nudge.value = "As clicked";
             this.drawPicker?.();
             return out;
         };

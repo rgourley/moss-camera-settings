@@ -44,6 +44,11 @@ For a new picture, change the seed or the prompt and click again. Keep the seed 
 | `keep_sharp` | Narrow, Normal, Wide | Use Wide if part of the subject goes soft. |
 | `subject_edge` | Crisp, Natural, Soft, Very soft | Soften it if the subject looks cut out. Very soft can blur a face in profile. |
 | `foreground` | Sharp, Blurred | Whether things nearer than your click go soft too. To focus on something close, just click it. |
+| `focus_nudge` | Nearer, As clicked, Farther | Moves the focus a little nearer or farther than your click, like turning the focus ring. See the example below. |
+
+**Example: `focus_nudge`.** All three use the same click on the tailor's face, 35mm, aperture Very blurred, foreground Blurred. Nearer moves the focus toward the camera, so he goes soft. Farther moves it behind him, so the window gets sharper and he stays sharp. Try it when the face comes out a little soft, or when you want the sharp zone just in front of or behind what you clicked. With a nudge on, the subject's edge comes from the depth map, so it can be rougher.
+
+![focus_nudge: Nearer, As clicked, Farther](examples/focus-nudge.jpg)
 
 A good place to start: 50mm, aperture Soft or Blurred, Normal light, Light vignette, face detail off. For a portrait, go to 85mm.
 
@@ -51,6 +56,7 @@ A good place to start: 50mm, aperture Soft or Blurred, Normal light, Light vigne
 
 - The clean edge only applies when you click the main subject. Click something else, like an object in the foreground, and the edge comes from the depth map, which is rougher.
 - Tabletop products can get a hard line where sharp meets blurred.
+- Focus and aperture can give mixed results. Focusing on something in front of or behind the subject works best when it's clearly nearer or farther away. When it sits at about the subject's distance, little changes.
 - Thin things like nets confuse the depth map.
 - With `foreground` on Blurred, open ground can show a sharp strip with blurred bands in front and behind.
 - Text in renders often comes out garbled.

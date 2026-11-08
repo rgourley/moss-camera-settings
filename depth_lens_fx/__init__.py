@@ -230,6 +230,30 @@ def eased_dim(blurred, amount, dim):
 EDGE_LOW = 0.0  # raising this pulls the subject's edge inward
 
 
+def whole_objects(found, d, amount, cx, cy, focus, behind_edge, far):
+    """The model can find more than one thing, like a player and a ball. Only the thing that was clicked is held sharp.
+    Anything else it found that stands further back is one distance, so it blurs evenly, not more at the head than at the feet."""
+    from scipy import ndimage
+    labels, count = ndimage.label((found > 0.5).cpu().numpy())
+    if count < 2:
+        return found, amount
+    labels = torch.from_numpy(labels)
+    clicked = int(labels[cy, cx])
+    keep = found.clone()
+    for i in range(1, count + 1):
+        part = labels == i
+        if i == clicked or int(part.sum()) < 0.002 * part.numel():
+            continue
+        depth = d[part].median()
+        if depth >= focus - 0.05 * (focus - far):  # about as near as the click, or nearer: leave it as it was
+            continue
+        level = smooth((behind_edge - depth) / (behind_edge - far).clamp(min=1e-3))
+        grown = F.max_pool2d(part.float()[None, None], 9, stride=1, padding=4)[0, 0] > 0
+        amount = torch.where(grown, torch.maximum(amount, level), amount)
+        keep = torch.where(grown, torch.zeros_like(keep), keep)
+    return keep, amount
+
+
 def lens_blur(rgb, amount, rmax, bloom, steps=14, kernel=disc, dim=0.0, edge_refine=1.0, edge_soft=0.0, cutout=None):
     """Blurs at several radii, leaving out the sharp subject so it can't bleed in, then blends per pixel between the two nearest radii."""
     if cutout is not None:  # the depth map reaches a little past the subject's real edge: just outside it, take the blur of the background nearby
@@ -324,6 +348,7 @@ class DepthLensBlur:
             "edge_refine": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.05, "tooltip": "Fits the subject's edge to fine lines like hair. Lower it if the background shows sharp patches around the subject."}),
         }, "optional": {
             "edge_softness": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 8.0, "step": 0.5, "tooltip": "Softens the subject's edge so it doesn't look cut out. 1.5 is natural, 2.5 is soft, 4 is very soft. High values blur features near the edge."}),
+            "focus_shift": ("FLOAT", {"default": 0.0, "min": -1.0, "max": 1.0, "step": 0.05, "tooltip": "Moves the focus a little nearer (above 0) or farther (below 0) than the point you click, like turning the focus ring. 0 focuses on the click."}),
         }}
 
     RETURN_TYPES = ("IMAGE", "IMAGE")
@@ -331,7 +356,7 @@ class DepthLensBlur:
     FUNCTION = "run"
     CATEGORY = "image/lens"
 
-    def run(self, image, focus_x, focus_y, blur, sharp_range, foreground_blur, highlight_bloom, background_dim=0.0, edge_refine=1.0, edge_softness=0.0):
+    def run(self, image, focus_x, focus_y, blur, sharp_range, foreground_blur, highlight_bloom, background_dim=0.0, edge_refine=1.0, edge_softness=0.0, focus_shift=0.0):
         images, depths = [], []
         for rgb in image.cpu():
             rgb = rgb[..., :3]
@@ -347,13 +372,16 @@ class DepthLensBlur:
             focus = d[max(cy - r, 0):cy + r + 1, max(cx - r, 0):cx + r + 1].median()
             far = torch.quantile(F.interpolate(d[None, None], scale_factor=0.25, mode="area").flatten(), 0.02)
             near = torch.quantile(F.interpolate(d[None, None], scale_factor=0.25, mode="area").flatten(), 0.98)
+            focus = focus + focus_shift * ((near - focus) if focus_shift > 0 else (focus - far))  # the focus ring: a share of the way toward the nearest or farthest part
             behind_edge = focus - sharp_range * (focus - far)
             amount = smooth((behind_edge - d) / (behind_edge - far).clamp(min=1e-3))
             if foreground_blur > 0:
                 front_edge = focus + sharp_range * (near - focus)
                 amount = amount + foreground_blur * smooth((d - front_edge) / (near - front_edge).clamp(min=1e-3))
             found = find_subject(rgb) if edge_refine > 0 else None
-            on_it = found is not None and float(found[max(cy - r, 0):cy + r + 1, max(cx - r, 0):cx + r + 1].median()) > 0.5  # only when the click is on what the model found
+            on_it = focus_shift == 0 and found is not None and float(found[max(cy - r, 0):cy + r + 1, max(cx - r, 0):cx + r + 1].median()) > 0.5  # only when the click is on what the model found
+            if on_it:
+                found, amount = whole_objects(found, d, amount, cx, cy, focus, behind_edge, far)
             images.append(lens_blur(rgb, amount.clamp(0, 1), rmax, highlight_bloom, dim=background_dim, edge_refine=edge_refine, edge_soft=edge_softness, cutout=found if on_it else None))
         return (torch.stack(images), torch.stack(depths))
 
@@ -514,6 +542,7 @@ FACE_DETAIL = {"Off": 0.0, "Safe": 0.35, "Strong": 0.5}
 KEEP_SHARP = {"Narrow": 0.15, "Normal": 0.3, "Wide": 0.5}
 SUBJECT_EDGE = {"Crisp": 0.0, "Natural": 1.5, "Soft": 2.5, "Very soft": 4.0}
 FOREGROUND = {"Sharp": 0.0, "Blurred": 1.0}
+FOCUS_NUDGE = {"Farther": -0.3, "As clicked": 0.0, "Nearer": 0.3}
 
 
 def seen_path():
@@ -567,6 +596,7 @@ class CameraSettings:
             "focus_image": ("STRING", {"default": "", "tooltip": "Set by clicking: which image the click was made on."}),
             "subject_edge": (list(SUBJECT_EDGE), {"default": "Natural", "tooltip": "How soft the subject's edge is. Soften it if the subject looks cut out. Very soft can blur features near the edge, like a face in profile."}),
             "foreground": (list(FOREGROUND), {"default": "Sharp", "tooltip": "Whether things nearer than the point you click also go out of focus, as with a real lens."}),
+            "focus_nudge": (list(FOCUS_NUDGE), {"default": "As clicked", "tooltip": "Moves the focus a little nearer or farther than your click, like turning the focus ring. Try it when the face comes out slightly soft, or to put the sharp zone just in front of or behind what you clicked."}),
         }, "hidden": {"unique_id": "UNIQUE_ID"}}
 
     RETURN_TYPES = ("IMAGE", "CAMERA_SETTINGS", "FLOAT")
@@ -574,7 +604,7 @@ class CameraSettings:
     FUNCTION = "run"
     CATEGORY = "image/lens"
 
-    def run(self, image, lens, aperture, background_light, exposure, vignette, face_detail, keep_sharp, focus_x, focus_y, focus_image="", subject_edge="Natural", foreground="Sharp", unique_id=None):
+    def run(self, image, lens, aperture, background_light, exposure, vignette, face_detail, keep_sharp, focus_x, focus_y, focus_image="", subject_edge="Natural", foreground="Sharp", focus_nudge="As clicked", unique_id=None):
         # a new image with the old focus point would keep the wrong thing sharp
         signature = hashlib.md5(image[0, ::8, ::8, :3].cpu().numpy().tobytes()).hexdigest()
         seen = load_seen()
@@ -594,7 +624,7 @@ class CameraSettings:
         _, crop, fx, fy, _ = LensCrop().run(image, 35.0, mm, focus_x, focus_y, 0.0, 0.05, 0.0)
         blur = min(BACKGROUNDS[aperture] * (mm / 35.0) ** 0.5, 8.0)
         denoise = FACE_DETAIL[face_detail]
-        settings = {"focus_x": fx, "focus_y": fy, "blur": blur, "dim": BACKGROUND_LIGHT[background_light], "stops": EXPOSURES[exposure], "vignette": VIGNETTES[vignette], "denoise": denoise, "sharp_range": KEEP_SHARP[keep_sharp], "edge_soft": SUBJECT_EDGE[subject_edge], "foreground": FOREGROUND[foreground]}
+        settings = {"focus_x": fx, "focus_y": fy, "blur": blur, "dim": BACKGROUND_LIGHT[background_light], "stops": EXPOSURES[exposure], "vignette": VIGNETTES[vignette], "denoise": denoise, "sharp_range": KEEP_SHARP[keep_sharp], "edge_soft": SUBJECT_EDGE[subject_edge], "foreground": FOREGROUND[foreground], "focus_shift": FOCUS_NUDGE.get(focus_nudge, 0.0)}
         return (crop, settings, max(denoise, 0.01))
 
 
@@ -617,7 +647,7 @@ class CameraFinish:
     def run(self, crop, settings, detail=None):
         s = settings
         base = detail if s["denoise"] > 0 and detail is not None else crop
-        image, depth = DepthLensBlur().run(base, s["focus_x"], s["focus_y"], s["blur"], s["sharp_range"], s["foreground"], 1.0, s["dim"], 1.0, s["edge_soft"])
+        image, depth = DepthLensBlur().run(base, s["focus_x"], s["focus_y"], s["blur"], s["sharp_range"], s["foreground"], 1.0, s["dim"], 1.0, s["edge_soft"], s.get("focus_shift", 0.0))
         image = Exposure().run(image, s["stops"], 0.5)[0]
         if s["vignette"] > 0:
             image = RadialVignette().run(image, s["vignette"], 0.35, 1.0)[0]

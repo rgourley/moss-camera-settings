@@ -22,7 +22,7 @@
     "Node name for S&R": "MarkdownNote"
    },
    "widgets_values": [
-    "**How to use it**\n\n1. Write your **PROMPT** and press **Run**. It stops after the first render.\n2. Your image appears in **Camera Settings**. **Click your subject.** The box shows what the lens will keep.\n3. Pick your menus and press **Run** again. Only the finish runs, so it's quick.\n\n**New picture:** change **Seed** or the prompt, then click the subject again. Keep Seed on **fixed**. On randomize, every Run makes a new image, so it stops every time.\n\n**Part of the subject went soft?** Set `keep_sharp` to Wide.\n\n**Want a real lens look?** Set `foreground` to Blurred, so things nearer than your click go soft too. Click something close to the camera to pull the focus onto it.\n\n**Subject looks cut out?** Set `subject_edge` to Soft. Very soft can blur a face in profile.\n\n**Face detail** is off by default. Only try it when the face is large in the frame: it damages small faces, mouths and eyes first, and the added detail is invented.\n\n**Lens** is a crop, so perspective doesn't change.\n\nThe nodes at the bottom run on their own. The detail prompt is in there if you want to change it."
+    "**How to use it**\n\n1. Write your **PROMPT** and press **Run**. It stops after the first render.\n2. Your image appears in **Camera Settings**. **Click your subject.** The box shows what the lens will keep.\n3. Pick your menus and press **Run** again. Only the finish runs, so it's quick.\n\n**New picture:** change **Seed** or the prompt, then click the subject again. Keep Seed on **fixed**. On randomize, every Run makes a new image, so it stops every time.\n\n**Part of the subject went soft?** Set `keep_sharp` to Wide.\n\n**Want a real lens look?** Set `foreground` to Blurred, so things nearer than your click go soft too. Click something close to the camera to pull the focus onto it.\n\n**Focus slightly off?** Set `focus_nudge` to Nearer or Farther. It moves the focus a little toward or away from the camera from your click, like turning the focus ring. Results vary from image to image.\n\n**Subject looks cut out?** Set `subject_edge` to Soft. Very soft can blur a face in profile.\n\n**Face detail** is off by default. Only try it when the face is large in the frame: it damages small faces, mouths and eyes first, and the added detail is invented.\n\n**Lens** is a crop, so perspective doesn't change.\n\nThe nodes at the bottom run on their own. The detail prompt is in there if you want to change it."
    ],
    "title": "Read me"
   },
@@ -206,7 +206,8 @@
     -1,
     "",
     "Natural",
-    "Sharp"
+    "Sharp",
+    "As clicked"
    ]
   },
   {
