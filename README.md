@@ -25,9 +25,9 @@ The first run also downloads two small models, about 280 MB in total, and both r
 
 ## Use it
 
-1. Write your prompt and press **Run**. It stops after the first render, with your image in the **Camera Settings** node.
+1. Write your prompt and press **Run**. It stops after the first render, with your image in the **Camera Settings** node. Nothing is saved yet: the first Run never reaches Save Image.
 2. **Click what you want in focus.** The box shows what the lens will keep.
-3. Pick your menus and press **Run** again. Only the finish runs, because the render is reused.
+3. Pick your menus and press **Run** again. Only the finish runs, because the render is reused. This run saves the image to your ComfyUI output folder.
 
 For a new picture, change the seed or the prompt and click again. Keep the seed on **fixed**: on randomize, every Run makes a new image, so it stops every time.
 
